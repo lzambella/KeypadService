@@ -1,19 +1,27 @@
 #include "messagehandler.h"
 MessageHandler::MessageHandler(QObject *parent) : QObject(parent)
 {
-
+    //enabled_keys->resize(NUM_KEYSTROKES);
+    enabled_keys.resize(6);
 }
 
 void MessageHandler::handleMessage(const QByteArray &msg) {
     qDebug("Message Received!");
-    MessageHandler::hid_msg hid = msg2hid(msg);
-    MessageHandler::sendVirtualKeyEvent(hid);
+    qDebug() << "Message: " << msg;
+
+    if (msg.size() != NUM_KEYSTROKES +2) {
+        qDebug("Payload is not the correct size! Ignoring...");
+        return;
+    } else {
+        MessageHandler::hid_msg hid = msg2hid(msg);
+        MessageHandler::sendVirtualKeyEvent(hid);
+    }
 
 }
 
 MessageHandler::hid_msg MessageHandler::msg2hid(QByteArray msg) {
     struct MessageHandler::hid_msg hid;
-    qDebug() << "Message: " << msg;
+
     // Ignore the first two bytes of the report
     for (int i = 2; i < NUM_KEYSTROKES + 2; i++) {
         hid.k[i - 2] = msg.at(i);
@@ -25,8 +33,10 @@ void MessageHandler::sendVirtualKeyEvent(MessageHandler::hid_msg hid) {
     // Check each key event when there is a change
     // This method allows for n-key rollover
     for (int i = 0; i < NUM_KEYSTROKES; i++) {
-        // If zero do nothing
-        if (hid.k[i] == 0x00)
+        // If zero, set the enabled_keys[i] to zero as well
+        if (hid.k[i] == 0x00) {
+            enabled_keys[i] = 0x00;
+         } else if (hid.k[i] == enabled_keys.at(i))
             continue;
 
         INPUT inputs[2];
@@ -36,18 +46,19 @@ void MessageHandler::sendVirtualKeyEvent(MessageHandler::hid_msg hid) {
         inputs[0].type = INPUT_KEYBOARD;
         DWORD VK = hid2vk(hid.k[i]);
         inputs[0].ki.wVk = VK;
-        qDebug("Returned VK %x", (char) VK);
         inputs[1].type = INPUT_KEYBOARD;
         inputs[1].ki.wVk = VK;
         inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
         SendInput(NUM_KEYSTROKES, inputs, sizeof(INPUT));
-        qDebug() << "Sending HID inputs";
+        char c = hid.k[i];
+        enabled_keys[i] = c;
     }
 }
 
-// This should eventually be customizable
+// This should eventually be customizable with a struct containing
+// any modifiers and keys
 DWORD MessageHandler::hid2vk(char key) {
-    qDebug("Received key: %x", key);
+    //qDebug("Received key: %x", key);
     switch (key) {
     case 0x27:
         return VK_NUMPAD0;
@@ -68,7 +79,33 @@ DWORD MessageHandler::hid2vk(char key) {
     case 0x25:
         return VK_NUMPAD8;
     case 0x26:
-        return VK_NUMPAD8;
+        return VK_NUMPAD9;
+    case 0x04:
+        return 0x41;
+    case 0x05:
+        return 0x42;
+    case 0x06:
+        return 0x43;
+    case 0x07:
+        return 0x44;
+    case 0x08:
+        return 0x45;
+    case 0x09:
+        return 0x46;
+    case 0x0A:
+        return 0x47;
+    case 0x0B:
+        return 0x48;
+    case 0x0C:
+        return 0x49;
+    case 0x0D:
+        return 0x4A;
+    case 0x0E:
+        return 0x4B;
+    case 0x0F:
+        return 0x4C;
+
+
     }
     return 0x00;
 }

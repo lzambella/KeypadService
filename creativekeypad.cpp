@@ -23,12 +23,14 @@ void CreativeKeypad::addDevice(const QBluetoothDeviceInfo &device) {
 }
 
 void CreativeKeypad::connectDevice() {
-    delete(agent);
+    //delete(agent);
     qDebug("Connecting to device");
     if (creativeKeypadInfo == NULL) {
         qDebug("Target device was not found!\n");
-        return;
+        // restart the disovery process
+        agent->start();
     }
+    delete(agent);
     qDebug("Connecting to device\n");
     connection = new QLowEnergyController(*creativeKeypadInfo);
     // Set up connections
@@ -89,25 +91,19 @@ void CreativeKeypad::readCharacteristic(const QLowEnergyCharacteristic &characte
     // Then remove everything before that stop character
     // The payload is bytes but as a string, parse those to pure bytes so "00" becomes 0x00
     int i;
-    // Do every other character because we check 2 at a time
-    for (i = 0; i < value.size(); i = i + 2) {
+    for (i = 0; i < value.size(); i++) {
         // Check if the index overflows
-        if (i >= value.size())
+        if (rxBuffer.size() > 100) {
+            rxBuffer.clear();
             return;
+        }
         if (value[i] == (char) 0xff) {
             // emit signal and clear the buffer
             emit CreativeKeypad::messageReveiced(rxBuffer);
             rxBuffer.clear();
         } else {
-            // evil qstring hack
-            QByteArray tmp;
-            // Here, two are appended because a char is a byte (0x00) but two chars represent
-            // a single byte. without the second append, the hex values will be
-            // zero padded
-            tmp.append(value.at(i));
-            tmp.append(value.at(i + 1));
-            QByteArray hexval = QByteArray::fromHex(tmp);
-            rxBuffer.append(hexval);
+            // append the received bytes to a buffer
+            rxBuffer.append(value[i]);
         }
     }
 

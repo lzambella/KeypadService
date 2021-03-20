@@ -5,6 +5,10 @@
 #include <QDebug>
 #include <windows.h>
 #include <WinUser.h>
+/**
+  * Max number of keystrokes allowed from device
+  * This is standard to bluetotoh LE HID
+  */
 #define NUM_KEYSTROKES 6
 class MessageHandler : public QObject
 {
@@ -15,7 +19,12 @@ public:
         char modifier;
         char k[NUM_KEYSTROKES];
     };
-
+    /**
+     * @brief Byte array describing which keys are being pressed
+     * This should be traversed before deciding which keystroke to send
+     * to the operating system.
+     */
+    QByteArray enabled_keys;
     explicit MessageHandler(QObject *parent = nullptr);
     /**
      * @brief Event fired when a message has been received from CreativeKeypad::messageReceived
