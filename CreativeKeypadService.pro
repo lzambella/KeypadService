@@ -12,7 +12,9 @@ LIBS += -luser32 -lshell32 -gdi32
 SOURCES += \
         creativekeypad.cpp \
         main.cpp \
-        messagehandler.cpp
+        messagehandler.cpp \
+        ../ConfigProgram/keypadconfiguration.cpp \
+        ../ConfigProgram/shortcutkey.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -21,4 +23,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     creativekeypad.h \
-    messagehandler.h
+    messagehandler.h \
+    ../ConfigProgram/keypadconfiguration.h \
+    ../ConfigProgram/shortcutkey.h

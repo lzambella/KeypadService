@@ -3,8 +3,14 @@
 
 #include <QObject>
 #include <QDebug>
+#include <QFile>
+#include <QIODevice>
+#include <QDataStream>
 #include <windows.h>
 #include <WinUser.h>
+#include "../ConfigProgram/keypadconfiguration.h"
+#include "../ConfigProgram/shortcutkey.h"
+
 /**
   * Max number of keystrokes allowed from device
   * This is standard to bluetotoh LE HID
