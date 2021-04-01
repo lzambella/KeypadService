@@ -47,7 +47,7 @@ public:
 
     void sendVirtualKeyEvent(hid_msg hid);
     DWORD hid2vk(char key);
-
+    KeypadConfiguration config;
 signals:
 
 };

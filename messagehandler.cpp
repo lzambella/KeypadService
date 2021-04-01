@@ -3,6 +3,18 @@ MessageHandler::MessageHandler(QObject *parent) : QObject(parent)
 {
     //enabled_keys->resize(NUM_KEYSTROKES);
     enabled_keys.resize(6);
+    // File streams
+    QFile file("../config.dat");
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Could not open configuration file!";
+    } else {
+        QDataStream str(&file);
+        str.startTransaction();
+        str >> config;
+        str.commitTransaction();
+        file.close();
+    }
 }
 
 void MessageHandler::handleMessage(const QByteArray &msg) {
@@ -58,19 +70,6 @@ void MessageHandler::sendVirtualKeyEvent(MessageHandler::hid_msg hid) {
 // This should eventually be customizable with a struct containing
 // any modifiers and keys
 DWORD MessageHandler::hid2vk(char key) {
-    KeypadConfiguration config;
-    // File streams
-    QFile file("../config.dat");
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        qDebug() << "Could not open configuration file!";
-        return 0x00;
-    }
-    QDataStream str(&file);
-    str.startTransaction();
-    str >> config;
-    str.commitTransaction();
-    file.close();
     //qDebug("Received key: %x", key);
     switch (key) {
     case 0x27:
@@ -94,31 +93,29 @@ DWORD MessageHandler::hid2vk(char key) {
     case 0x26:
         return VK_NUMPAD9;
     case 0x04:				// Encoder A Left
-        return config.encoder_a[1].virtual_key;
+        return this->config.encoder_a[1].virtual_key;
     case 0x05:				// Encoder A Right
-        return config.encoder_a[0].virtual_key;
+        return this->config.encoder_a[0].virtual_key;
     case 0x06:
-        return 0x43;
+        return this->config.encoder_b[1].virtual_key;
     case 0x07:
-        return 0x44;
+        return this->config.encoder_b[0].virtual_key;
     case 0x08:
-        return 0x45;
+        return this->config.encoder_c[1].virtual_key;
     case 0x09:
-        return 0x46;
+        return this->config.encoder_c[0].virtual_key;
     case 0x0A:
-        return 0x47;
+        return this->config.encoder_d[1].virtual_key;
     case 0x0B:
-        return 0x48;
+        return this->config.encoder_d[0].virtual_key;
     case 0x0C:
-        return 0x49;
+        return this->config.encoder_e[1].virtual_key;
     case 0x0D:
-        return 0x4A;
+        return this->config.encoder_e[0].virtual_key;
     case 0x0E:
-        return 0x4B;
+        return this->config.encoder_f[1].virtual_key;
     case 0x0F:
-        return 0x4C;
-
-
+        return this->config.encoder_f[0].virtual_key;
     }
     return 0x00;
 }
