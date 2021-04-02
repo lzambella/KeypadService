@@ -73,25 +73,25 @@ DWORD MessageHandler::hid2vk(char key) {
     //qDebug("Received key: %x", key);
     switch (key) {
     case 0x27:
-        return VK_NUMPAD0;
+        return this->config.num_pad[0].virtual_key;
     case 0x1E:
-        return VK_NUMPAD1;
+        return this->config.num_pad[1].virtual_key;
     case 0x1F:
-        return VK_NUMPAD2;
+        return this->config.num_pad[2].virtual_key;
     case 0x20:
-        return VK_NUMPAD3;
+        return this->config.num_pad[3].virtual_key;
     case 0x21:
-        return VK_NUMPAD4;
+        return this->config.num_pad[4].virtual_key;
     case 0x22:
-        return VK_NUMPAD5;
+        return this->config.num_pad[5].virtual_key;
     case 0x23:
-        return VK_NUMPAD6;
+        return this->config.num_pad[6].virtual_key;
     case 0x24:
-        return VK_NUMPAD7;
+        return this->config.num_pad[7].virtual_key;
     case 0x25:
-        return VK_NUMPAD8;
+        return this->config.num_pad[8].virtual_key;
     case 0x26:
-        return VK_NUMPAD9;
+        return this->config.num_pad[9].virtual_key;
     case 0x04:				// Encoder A Left
         return this->config.encoder_a[1].virtual_key;
     case 0x05:				// Encoder A Right
